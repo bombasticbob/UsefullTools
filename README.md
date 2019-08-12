@@ -18,14 +18,15 @@ like youtube.  Uses 'twolame' to encode.
 
 * agg.c - A simple POSIX utility that allows you to aggregate column data, separated
 by white space.  In short, you can do sums, averages, and so on, with
-text data formatted in columns (text or numeric).  Run the program without
-any parameters to get a simple 'usage' display of options.
+text data formatted in columns (text or numeric).  Run the program with '-h'
+to get a simple 'usage' display of options.
 
-* do_dft.c, do_dft2.c - These programs do a DFT analysis of x,y data (2 columns) with arbitrary time
-between data points. The first one is a basic DFT, single-threaded.  The 2nd
-one has some compile options for "fast DFT" (using fast sin/cos algorithms
-that work well on embedded or microcontrollers) and is also multi-threaded.
-They work with text formatted in columns separated by white space.
+* do_dft.c, do_dft2.c - These programs do a DFT analysis of x,y data (2 columns) with
+arbitrary time between data points. The first one is a basic DFT, single-threaded.
+The 2nd one (do_dft2) has some compile options for "fast DFT" (using fast sin/cos
+algorithms that work well on embedded or microcontrollers) and is also multi-threaded.
+They work with text formatted in columns separated by white space.  Run the programs
+with '-h' to get a list of options, etc.
 
 (I'll add more at some point)
 
