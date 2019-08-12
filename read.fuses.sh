@@ -5,6 +5,9 @@
 # released to public domain - enjoy!
 # (I did a lot of work here, it's probably educational)
 #
+# this utility assumes that avrdude is in /usr/local/bin and that its
+# config file is in /usr/local/etc/avrdude.conf - if your system is different
+# just edit the appropriate stuff.
 
 # convert 1st param to a binary value
 to_binary ( )
@@ -63,23 +66,14 @@ case $CPU in
   (*) echo "invalid CPU type $CPU"; exit;;
 esac
 
-
-# /usr/local/bin/avrdude -v -C/usr/local/etc/avrdude.conf -patmega328p -cstk500v1 -P/dev/ttyU0 -b57600 -Ulock:r:/tmp/outX.out:m -Uefuse:r:/tmp/outE.out:m -Uhfuse:r:/tmp/outH.out:m -Ulfuse:r:/tmp/outL.out:m
-#/usr/local/bin/avrdude -v -C/usr/local/etc/avrdude.conf -patmega328p -carduino -P/dev/ttyU0 -b57600 -Ulock:r:/tmp/outX.out:h -Uefuse:r:/tmp/outE.out:h -Uhfuse:r:/tmp/outH.out:h -Ulfuse:r:/tmp/outL.out:h
-
-#/usr/local/bin/avrdude -F -cavrispmkII -Pusb -v -C/usr/local/etc/avrdude.conf -patmega328p -Ulock:r:/tmp/outX.out:m -Uefuse:r:/tmp/outE.out:m -Uhfuse:r:/tmp/outH.out:m -Ulfuse:r:/tmp/outL.out:m
-
-#if test -z "temporary" ; then
+# the AVRDUDE command - yes the paths are hard coded.  deal with it
 /usr/local/bin/avrdude -F -cavrispmkII -Pusb -v -C/usr/local/etc/avrdude.conf \
   -p${CPU} \
   -Ulock:r:/tmp/outX.out:h -Uefuse:r:/tmp/outE.out:h -Uhfuse:r:/tmp/outH.out:h -Ulfuse:r:/tmp/outL.out:h
-#else
-#  echo "0xff" >/tmp/outX.out
-#  echo "0xff" >/tmp/outE.out
-#  echo "0xd9" >/tmp/outH.out
-#  echo "0x62" >/tmp/outL.out
-#fi
 
+# SOME DOCUMENTATION STARTS HERE
+# ------------------------------
+#
 # fuse info:
 # a) '0' means 'programmed', '1' means 'not programmed' - data sheet section 9.2
 # b) CKSEL preprogrammed to 0010 (8mhz internal)
