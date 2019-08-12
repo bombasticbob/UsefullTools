@@ -28,5 +28,10 @@ algorithms that work well on embedded or microcontrollers) and is also multi-thr
 They work with text formatted in columns separated by white space.  Run the programs
 with '-h' to get a list of options, etc.
 
+* banner.sh - generates a 'figlet' banner using 'figlet', with some copyright info.
+It is basically designed to be a block header for C/C++ programs, but you could adapt
+it for shell scripts, python, java(script), whatever, as you see fit.  Just edit the
+line that says 'Your Organization' and put, well, YOUR Organization in there.
+
 (I'll add more at some point)
 
