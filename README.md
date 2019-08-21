@@ -10,6 +10,8 @@ here's a short list of what they do
 CPU, allowing you to specify which one if it's not an atmega328p .  It also
 decodes them into human readable form which is the important part.
 
+* new.write.fuses.sh - a simple script to write fuses for atmega series using AVRISPMkII
+
 * flash2mp3.sh - extract mp3 audio from flash video, or actually ANY video format that ffmpeg
 will recognize.  Originally designed for flash videos downloaded from sites
 like youtube.  Uses 'twolame' to encode.
