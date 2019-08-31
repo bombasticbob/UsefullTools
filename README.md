@@ -35,5 +35,14 @@ It is basically designed to be a block header for C/C++ programs, but you could 
 it for shell scripts, python, java(script), whatever, as you see fit.  Just edit the
 line that says 'Your Organization' and put, well, YOUR Organization in there.
 
+* bsd_lcd_text.c - this program displays text on an LCD on an RPi either from FreeBSD
+or from Linux (Raspian).  In both cases you have to load the correct overlay.  What it
+does more than anything else is demonstrate the use of the SPI interface.  It is based
+on open source code and so it should be distributed accordingly.
+
+* rpi_lcd_text.c - this is similar to bsd_lcd_text.c but uses bit-bang for the SPI with
+the Raspberry Pi's GPIO '/sys' interface.
+
+
 (I'll add more at some point)
 
