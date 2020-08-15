@@ -25,21 +25,57 @@
 // hence this code is also covered by the [L]GPLv2[.1]
 // 'lcd_text.c' for Raspberry Pi - derived from Arduino's Liquid Crystal library ([L]GPLv2.1)
 // as derived code it is also covered by the [L]GPLv2.1 (or later) as is all of the Arduino library code
+// for more information, see the following:  https://github.com/arduino-libraries/LiquidCrystal
 
 // adapted for FreeBSD as 'bsd_lcd_text.c'
+// This version uses FreeBSD's 'spigen' ioctl.  The 'spigen' overlay is required for it to work properly
+
+// WIRING INFO    WIRING INFO   WIRING INFO
+//
+// For this to work, use a standard LCD that's based on the Hitachi HD44780U LCD controller.
+// (most of the inexpensive ones with a 15-pin or 16-pin interface seem to be compatible)
+//
+// For a 16-pin version, you might connect is as shown
+//
+// ------
+// |    | --- 1 -- ground
+// |    | --- 2 -- 5V Vcc
+// |    | --- 3 -- VD (contrast adjust, 0V to 5V potentiometer)
+// |    | --- 4 -- RS - shift register Q1/QA
+// |    | --- 5 -- R/W - ground
+// | L  | --- 6 -- E - shift register Q2/QB
+// |    | --- 7 -- D0 - NC
+// | C  | --- 8 -- D1 - NC
+// |    | --- 9 -- D2 - NC
+// | D  | -- 10 -- D3 - NC
+// |    | -- 11 -- D4 - shift register Q3/QC
+// |    | -- 12 -- D5 - shift register Q4/QD
+// |    | -- 13 -- D6 - shift register Q5/QE
+// |    | -- 14 -- D7 - shift register Q6/QF
+// |    | -- 15 -- BL+ - back light (47 ohm resistor to 5V)
+// |    | -- 16 -- BL- - back light (ground, when present)
+// ------
+//
+// the shift register will typically be a 74HC595, but can also be a 4094 if you wire
+// in a transistor to disconnect SCK from the shift reg clock whenever CS is low
+//
+// The shift reg will otherwise have SCK to clock, MOSI to 'SER' or 'D' (the shift
+// reg input), and CS/SS to the 'RCK' (or in the case of 4094, 'strobe') pin.
+//
+// Other connections on 74HC595 include !G at ground, !SCL at Vcc potential.
 
 #ifdef __FreeBSD__
 // TODO:  FBSD-specific interface??
 
-#define USE_SPIGEN /* temporary */
-#define USE_SPIGEN_CC /* also temporary */
+#define USE_SPIGEN    /* tells it to use the spigen lib */
+#define USE_SPIGEN_CC /* tells it to use the CS select via the spigen device */
 
 #define SPI_SPEED 244000
 
 #else // ! __FreeBSD__
 #ifdef __linux__
 
-#define USE_SPIDEV
+#define USE_SPIDEV    /* tells it to use the 'spidev' lib */
 #define SPI_SPEED 244000
 
 #else
