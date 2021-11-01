@@ -12,6 +12,14 @@ decodes them into human readable form which is the important part.
 
 * new.write.fuses.sh - a simple script to write fuses for atmega series using AVRISPMkII
 
+* rehex.c - converts an intel hex file into something that's consistent with avrdude's
+NVRAM read function (-U 'r' in intel format).  You can use this to compare (for example) an
+existing bootloader image with what is actually on the device.  The image created by gcc
+and ld is likely to have 16 bytes per line, but avrude uses 32 bytes per line.  Converting
+the hex file that was built for flashing via avrdude and the gcc/ld tools lets you do
+a simple 'diff' to see if they match.  This utility is as-is with some limitations,
+intended for Arduino and AVR processors.  (It is currently incomplete)
+
 * flash2mp3.sh - extract mp3 audio from flash video, or actually ANY video format that ffmpeg
 will recognize.  Originally designed for flash videos downloaded from sites
 like youtube.  Uses 'twolame' to encode.
