@@ -286,6 +286,9 @@ char *optarg;
     }
   }
 
+  argc -= optind;
+  argv += optind;
+
   if(bTest)
   {
     static const char szTest[]=
@@ -2019,10 +2022,37 @@ static const int nCols = 16;
   WBDebugPrint("==========================================================================================\n");
 }
 
+static int XMLFilterMatch(const char *szLabel, int argc, const char *argv[])
+{
+int i1, cb;
+
+  if(argc < 1)
+    return 1; // all
+
+  for(i1=0; i1 < argc; i1++)
+  {
+    cb = strlen(argv[i1]);
+
+    if(!cb)
+      continue; // unlikely
+
+//    fprintf(stderr, "Test %s against %s\n", szLabel, argv[i1]);
+
+    if(!strncasecmp(szLabel, argv[i1], cb) &&
+       (!szLabel[cb] || szLabel[cb] == '.'))
+    {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 void DoPrintXMLLevel(const char *szPrefix, int iIndex, int argc, const char *argv[], CHXMLEntry *pXML)
 {
 int i1, iCont;
 char *p1;
+
 
   i1 = iIndex;
   iCont = pXML[i1].iContainer;
@@ -2048,17 +2078,18 @@ char *p1;
 
     if(pXML[i1].nLabelOffset >= 0)
       WBCatString(&p1, (const char *)pXML + pXML[i1].nLabelOffset);
-//    else
-//      WBCatString(&p1, "[none]");
 
-    if(pXML[i1].nDataOffset >= 0)  // only display this if there is a value.
+    if(XMLFilterMatch(p1, argc, argv))
     {
-      // TODO filter check
-      printf("%s\t%s\n", p1, (const char *)pXML + pXML[i1].nDataOffset);
-    }
-    else if(pXML[i1].nLabelOffset >= 0 && pXML[i1].iContentsIndex <= 0) // tag with no values
-    {
-      printf("%s\t\n", p1); // the tab identifies it as a tag with no value
+      if(pXML[i1].nDataOffset >= 0)  // only display this if there is a value.
+      {
+        // TODO filter check
+        printf("%s\t%s\n", p1, (const char *)pXML + pXML[i1].nDataOffset);
+      }
+      else if(pXML[i1].nLabelOffset >= 0 && pXML[i1].iContentsIndex <= 0) // tag with no values
+      {
+        printf("%s\t\n", p1); // the tab identifies it as a tag with no value
+      }
     }
 
     if(pXML[i1].iContentsIndex > 0)
