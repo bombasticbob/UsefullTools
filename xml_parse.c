@@ -328,7 +328,7 @@ char *optarg;
       return 1;
     }
 
-    fwrite(pBuf, cbBuf, 1, stderr);
+//    fwrite(pBuf, cbBuf, 1, stderr); temporary write XML to stderr [testing]
 
     pXML = CHParseXML(pBuf, cbBuf);
     free(pBuf);
