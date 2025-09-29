@@ -51,6 +51,9 @@ on open source code and so it should be distributed accordingly.
 * rpi_lcd_text.c - this is similar to bsd_lcd_text.c but uses bit-bang for the SPI with
 the Raspberry Pi's GPIO '/sys' interface.
 
+* xml_parse.c - a simple XML parser that allows you to query one or more vaalues from
+the hierarchy, expressed with dotted notation
+
 
 (I'll add more at some point)
 
