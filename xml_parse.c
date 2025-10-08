@@ -156,6 +156,9 @@ void  DoPrintXMLContents(int argc, const char *argv[], CHXMLEntry *pXML);
 
 WB_UINT64 iWBDebugLevel=0;
 
+// display flags
+int bGroup = 0, bEmpty = 0, bIndex = 0;
+
 static __inline__ WB_UINT64 WBGetDebugLevel(void)
 {
   return iWBDebugLevel;
@@ -163,7 +166,23 @@ static __inline__ WB_UINT64 WBGetDebugLevel(void)
 
 void usage()
 {
-  fputs("Usage: [-h][-i file] 'xml.value.thingy' ['xml.value.thingy'[...]]\n",
+  // -h help
+  // -r Raw, default, show contents as-is in the order read, not valid with -g
+  // -e Empty, show empty XML tags with no value if the value does not immediately follow and there are named values
+  // -g group, alters display order of values, not valid with -r
+  // -n index, display an index for tag names with multiple matching entries
+
+  fputs("Usage: [-h][-i file][-[r,g][e][n]] 'xml.value.thing' ['xml.value.thing'[...]]\n"
+        "  where\n"
+        "    -h - help, display this message and exit\n"
+        "    -i - specify an input file, default is stdin\n"
+        "    -r - Raw, default, show contents ordered as-is in the order read,\n"
+        "         not valid with -g\n"
+        "    -e - Empty, show empty XML tags with no value if the default value does\n"
+        "         not immediately follow and there are named values\n"
+        "    -g - Group, alters display order of values, not valid with -r\n"
+        "    -n - Index, display an index for tag names with multiple matching\n"
+        "         entries, as 'name:0', 'name:1', etc. rather than 'name'\n",
         stderr);
 }
 
@@ -212,7 +231,7 @@ char *optarg;
     }
 
     i1 = argv[optind][i2++];
-    if(!strchr("vht", i1)) // things with no arguments
+    if(!strchr("hvtregn", i1)) // things with no arguments
     {
       if(i1 == 'i') // required args
       {
@@ -258,11 +277,15 @@ char *optarg;
       }
     }
 #else // WIN32
-  while((i1 = getopt(argc, argv, "hvti:")) >= 0)
+  while((i1 = getopt(argc, argv, "hvtregni:")) >= 0)
   {
 #endif // WIN32
     switch(i1)
     {
+      case 'h':
+        usage();
+        return -1;
+
       case 'i':
         strncpy(fname, optarg, sizeof(fname) - 1);
         break;
@@ -271,12 +294,24 @@ char *optarg;
         iWBDebugLevel++;
         break;
 
-      case 'h':
-        usage();
-        return -1;
-
       case 't':
         bTest = 1;
+        break;
+
+      case 'r':
+        bGroup = 0;
+        break;
+
+      case 'e':
+        bEmpty = 1;
+        break;
+
+      case 'g':
+        bGroup = 1;
+        break;
+
+      case 'n':
+        bIndex = 1;
         break;
 
       default:
@@ -297,6 +332,7 @@ char *optarg;
       "  TestValue\n"
       "  <test>boo</test>\n"
       "  <thing doohickey/>\n"
+      "  <test>hoo</test>\n"
       "</TheXML>\n";
 
 
@@ -2048,9 +2084,41 @@ int i1, cb;
   return 0;
 }
 
+int DoPrintXMLGetArrayIndex(CHXMLEntry *pXML, int iIndex, int iContainer)
+{
+int i1, i2, iRval = -1, bFirst = 1;
+
+  if(iContainer < 0) // top level
+    i1 = 0;
+  else if(pXML[iContainer].iContentsIndex > 0)
+    i1 = pXML[iContainer].iContentsIndex;
+  else
+    return -1; // to avoid certain problems
+
+  for(i2 = 0; bFirst || i1 > 0; i1 = pXML[i1].iNextIndex)
+  {
+    bFirst = 0;
+
+    if(i1 == iIndex)
+      iRval = i2;
+
+    if(!strcasecmp((const char *)pXML + pXML[i1].nLabelOffset,
+                   (const char *)pXML + pXML[iIndex].nLabelOffset))
+    {
+      i2++;
+    }
+  }
+
+  if(i2 > 1)
+    return iRval;
+
+  return -1;  // is not an array
+}
+
+
 void DoPrintXMLLevel(const char *szPrefix, int iIndex, int argc, const char *argv[], CHXMLEntry *pXML)
 {
-int i1, iCont;
+int i1, iCont, iArrIdx;
 char *p1;
 
 
@@ -2079,9 +2147,22 @@ char *p1;
     if(pXML[i1].nLabelOffset >= 0)
       WBCatString(&p1, (const char *)pXML + pXML[i1].nLabelOffset);
 
+    if(bIndex)
+    {
+      iArrIdx = DoPrintXMLGetArrayIndex(pXML, i1, iCont);
+      if(iArrIdx >= 0)
+      {
+        char tbuf[64];
+
+        snprintf(tbuf, sizeof(tbuf) - 1, ":%d", iArrIdx);
+        WBCatString(&p1, tbuf);
+      }
+    }
+
     if(XMLFilterMatch(p1, argc, argv))
     {
-      if(pXML[i1].nDataOffset >= 0)  // only display this if there is a value.
+      if((bEmpty && pXML[i1].iContentsIndex > 0 && pXML[pXML[i1].iContentsIndex].nLabelOffset > 0) ||
+         pXML[i1].nDataOffset >= 0)  // only display this if there is a value.
       {
         // TODO filter check
         printf("%s\t%s\n", p1, (const char *)pXML + pXML[i1].nDataOffset);
