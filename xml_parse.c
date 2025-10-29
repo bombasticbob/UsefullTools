@@ -1676,14 +1676,6 @@ const char *CHFindEndingXMLTag(const char **ppTag, int cbLength, const char **pp
 const char *p1, *p2, *p3, *p4, *pE;
 char *pTagName;
 int nSpecial = 0, iNest, cbTagName;
-enum
-{
-  Special_NONE = 0,
-  Special_Question,
-  Special_Comment,
-  Special_CDATA,
-  Special_BANG
-};
 
   if(ppOpenTagEnd)
     *ppOpenTagEnd = NULL; // pre-assign to NULL
